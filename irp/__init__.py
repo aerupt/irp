@@ -5,8 +5,15 @@ import requests
 
 IATACODES_API_KEY = os.environ.get('IATACODES_API_KEY')
 
-cities = requests.get("https://iatacodes.org/api/v6/cities?api_key={}".format(
-    IATACODES_API_KEY)).json()['response']
+CITIES = requests.get("https://iatacodes.org/api/v6/cities?api_key={}".format(
+    IATACODES_API_KEY
+)).json()['response']
+
+AIRPORTS = requests.get(
+    "https://iatacodes.org/api/v6/airports?api_key={}".format(
+        IATACODES_API_KEY
+    )
+).json()['response']
 
 
 def get_airports(str_city):
@@ -22,30 +29,33 @@ def get_airports(str_city):
     if ',' in str_city:
         city_part, country_part = map(str.strip, str_city.split(','))
     else:
-        city_part = str_city
+        city_part, country_part = str_city, None
 
     if len(city_part) == 3:
         try:
             yield city_part.upper(), [city['country_code']
-                                      for city in cities
+                                      for city in CITIES
                                       if city['code'].lower() == city_part][0]
             return
         except IndexError:
             pass  # No airport with that code available! Go on.
 
-    for city in cities:
+    for city in CITIES:
         if (city['name'].lower() == city_part and
                 (not country_part or
                  country_part == city['country_code'].lower())):
             yield city['code'], city['country_code']
 
 
-def get_city(airport: str):
+def get_name(airport: str):
     """
     :param airport: A three letter code, e.g. IRP
     """
-    for city in cities:
-        if city['code'].lower() == airport.lower():
+    uppered = airport.upper()
+    for city in CITIES:
+        if city['code'] == uppered:
             return city['name']
 
-    raise NotImplementedError('Cant resolve airport codes yet. Sorry.')
+    for airport in AIRPORTS:
+        if airport['code'] == uppered:
+            return airport['name']
