@@ -8,12 +8,13 @@ IATACODES_API_KEY = os.environ.get('IATACODES_API_KEY')
 try:
     CITIES = requests.get("https://iatacodes.org/api/v6/cities?api_key={}".format(
         IATACODES_API_KEY
-    )).json()['response']
+    ), verify=False).json()['response']
 
     AIRPORTS = requests.get(
         "https://iatacodes.org/api/v6/airports?api_key={}".format(
             IATACODES_API_KEY
-        )
+        ),
+        verify=False,
     ).json()['response']
 except Exception as exc:
     logging.exception('Failed to get data for IRP!')

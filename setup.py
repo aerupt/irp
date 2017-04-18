@@ -12,7 +12,7 @@ with open('README.rst') as readme:
 
 setup(
     name='irp',
-    version='0.3.1',
+    version='0.4.0',
     description='Gets possible airports for city names!',
     long_description=long_description,
     url='https://github.com/aerupt/irp',

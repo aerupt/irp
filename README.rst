@@ -27,3 +27,6 @@ This is how you use it:
 
     In [6]: get_name('IRP')
     Out[6]: 'Isiro'
+
+**NOTE** We're ATM bypassing iatacodes.org SSL verification. If you don't want
+this, patch it, it's probably easy but we needed a hotfix.
