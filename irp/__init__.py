@@ -51,6 +51,16 @@ def get_airports(str_city):
             yield city['code'], city['country_code']
 
 
+def get_airport(airport: str):
+    """
+    :param airport: A three letter code, e.g. IRP
+    """
+    uppered = airport.upper()
+    for airport in AIRPORTS:
+        if airport['code'] == uppered:
+            return airport
+
+
 def get_name(airport: str):
     """
     :param airport: A three letter code, e.g. IRP
@@ -60,6 +70,7 @@ def get_name(airport: str):
         if city['code'] == uppered:
             return city['name']
 
-    for airport in AIRPORTS:
-        if airport['code'] == uppered:
-            return airport['name']
+    airport = get_airport(airport)
+    if airport:
+        return airport['name']
+
