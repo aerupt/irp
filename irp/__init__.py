@@ -2,8 +2,20 @@ import os
 import requests
 import logging
 
+from functools import lru_cache
+
 
 IATACODES_API_KEY = os.environ.get('IATACODES_API_KEY')
+
+
+@lru_cache(None)
+def cached_json_get(url):
+    """
+    Makes a get to that URL and caches it. Simple right? Oh it also returns the
+    JSON as a dict for you already!
+    """
+    return requests.get(url).json()
+
 
 try:
     CITIES = requests.get("https://iatacodes.org/api/v6/cities?api_key={}".format(
@@ -16,6 +28,10 @@ try:
         ),
         verify=False,
     ).json()['response']
+
+    COUNTRIES = requests.get(
+        "https://restcountries.eu/rest/v2/all"
+    ).json()
 except Exception as exc:
     logging.exception('Failed to get data for IRP!')
 
@@ -74,3 +90,22 @@ def get_name(airport: str):
     if airport:
         return airport['name']
 
+
+def get_airport_country(airport: str):
+
+    ADDR_INFO = "https://maps.googleapis.com/maps/api/geocode/json?address={0}%20Airport&sensor=false"
+    airport_info = cached_json_get(ADDR_INFO.format(airport))
+
+    comps = airport_info['results'][0]['address_components']
+    for comp in comps:
+        if 'country' in comp['types']:
+            return comp['long_name'], comp['short_name']
+
+def get_currency(airport: str):
+    """
+    :param airport: A three letter airport code
+    """
+    country, short = get_airport_country(airport)
+    for _country in COUNTRIES:
+        if short == _country['alpha2Code']:
+            return _country['currencies']
