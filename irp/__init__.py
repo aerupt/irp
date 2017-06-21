@@ -109,3 +109,9 @@ def get_currency(airport: str):
     for _country in COUNTRIES:
         if short == _country['alpha2Code']:
             return _country['currencies']
+
+
+def get_carrier(carrier: str):
+    airline = requests.get("https://iatacodes.org/api/v6/airlines?api_key={}&code={}"
+        .format(IATACODES_API_KEY, carrier), verify=False).json()['response']
+    return airline[0]['name']
